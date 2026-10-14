@@ -40,3 +40,11 @@ Portal 的 main 变更通过 Cloudflare Git 集成发布；课程 main 变更由
 ## 当前发布配置
 
 正式 Pages 项目为 `archer-ai-courses`，连接本公开仓库；main 自动生产部署已启用，预览分支自动部署关闭。构建、同源链接检查与隔离本地 D1 测试通过后发布。共享 D1 绑定与兼容日期由 wrangler.jsonc 维护。Cloudflare 构建使用当前 Version 3 环境，满足上述最低版本；部署记录可通过 build-info.json 核对两个源码仓库的实际 commit。
+
+## 留言回复
+
+课件和深入阅读的每条留言可打开内嵌回复框；同一留言的回复按时间排列，较多时可展开更早回复。留言和回复仍无需登录，称呼选填并公开，联系方式选填且仅保存在 D1。匿名昵称不代表身份认证，也没有讲师身份标记。
+
+`0003_comment_replies.sql` 只新增回复表及索引，不改原留言。回复绑定本课程的原留言；后台删除原留言会同步删除其回复。单条回复也可在 D1 的 comment_replies 表按 id 删除。公开 API 从不返回联系方式；根留言和回复共用原来的每分钟写入限额。网络重试复用提交编号，重复请求保留原内容和联系方式。
+
+发布回复功能前须先在已有 D1 执行 0003，再推送 Portal main 自动构建发布。`npm test` 核对真实本地 D1 的回复、隐私、重试、分页、范围和级联删除；`tests/replies-browser.mjs` 只允许本机地址，验证内嵌表单、草稿、网络重试、跨课件页面、手机与更早回复。动态分页检查使用 `REPLIES_BROWSER_STATE` 指向隔离本地数据库，以及预置的 browser-root、browser-paged 和 browser-dynamic 合成案例。合成回复不得发到公网。

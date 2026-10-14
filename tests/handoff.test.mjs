@@ -31,7 +31,7 @@ async function request(route,headers={}){const r=await fetch(base+route,{headers
 async function ticket(token,expires=Date.now()+120000){const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(token))),b=>b.toString(16).padStart(2,'0')).join('');await sql(`INSERT INTO visitor_transfers VALUES ('${hash}','${visitor}',${expires});`);}
 test('real D1 handoff is single-use, bounded, preserves data and old browser identity',async()=>{
  try{
-  for(const file of ['0001_course_interactions.sql','0002_visitor_handoff.sql'])await execute('npx',[...cli,'d1','execute','COURSE_DB','--local','--persist-to',state,'--file','migrations/'+file],{cwd:root,env});
+  for(const file of ['0001_course_interactions.sql','0002_visitor_handoff.sql','0003_comment_replies.sql'])await execute('npx',[...cli,'d1','execute','COURSE_DB','--local','--persist-to',state,'--file','migrations/'+file],{cwd:root,env});
   await sql(`INSERT INTO reactions VALUES ('skill-engineering','${visitor}','like'); INSERT INTO comments VALUES ('seed','skill-engineering','已有昵称','private@example.invalid','已有留言','2026-10-13T00:00:00Z'); INSERT INTO page_events VALUES ('seed','courses','${visitor}','2026-10-14');`);
   await start(root,8792);
   const token=crypto.randomUUID();await ticket(token);

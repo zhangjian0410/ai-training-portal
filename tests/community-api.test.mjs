@@ -56,9 +56,17 @@ const endpoint = '/api/feedback/skill-engineering';
 const visit = (page = 'courses', event = crypto.randomUUID()) => ({page, event});
 const comment = (body, extra = {}) => ({action: 'comment', body, event: crypto.randomUUID(), ...extra});
 
+async function sql(command) {
+  const result = await execute('npx', [...cli, 'd1', 'execute', 'COURSE_DB', '--local', '--persist-to', state, '--command', command, '--json'], {cwd: root, env: environment});
+  return JSON.parse(result.stdout)[0].results;
+}
 before(async () => {
-  const migration = await execute('npx', [...cli, 'd1', 'execute', 'COURSE_DB', '--local', '--persist-to', state, '--file', 'migrations/0001_course_interactions.sql'], {cwd: root, env: environment});
-  await fs.writeFile(path.join(out, 'migration.log'), migration.stdout + migration.stderr);
+  let logs = '';
+  for (const file of ['0001_course_interactions.sql', '0002_visitor_handoff.sql', '0003_comment_replies.sql']) {
+    const migration = await execute('npx', [...cli, 'd1', 'execute', 'COURSE_DB', '--local', '--persist-to', state, '--file', 'migrations/' + file], {cwd: root, env: environment});
+    logs += migration.stdout + migration.stderr;
+  }
+  await fs.writeFile(path.join(out, 'migration.log'), logs);
   await start();
 });
 after(async () => {
@@ -132,4 +140,53 @@ test('real persisted database survives Worker restart', async () => {
   await stop(); await start();
   assert.deepEqual((await one.request('/api/metrics')).body, metricsBefore);
   assert.deepEqual((await two.request(endpoint)).body, feedbackBefore);
+});
+
+test('reply persists under the correct root; contact private; retry cannot duplicate or overwrite', async () => {
+  await sql("INSERT INTO comments VALUES ('reply-root','skill-engineering','原留言','private-root@example.invalid','原问题','2026-10-14T13:28:00Z');");
+  const client = new Client('192.0.2.120');
+  const input = {action: 'reply', parent_id: 'reply-root', body: '<script>alert(1)</script> 回复原样文本', name: '回复昵称', contact: 'reply-private@example.invalid', event: crypto.randomUUID()};
+  let result = await client.request(endpoint, input); assert.equal(result.status, 200);
+  let root = result.body.comments.find(row => row.id === 'reply-root');
+  assert.equal(root.reply_count, 1); assert.equal(root.replies[0].body, input.body);
+  assert.equal(JSON.stringify(result.body).includes(input.contact), false);
+  result = await client.request(endpoint, input); root = result.body.comments.find(row => row.id === 'reply-root'); assert.equal(root.reply_count, 1);
+  assert.equal((await client.request(endpoint, {...input, contact: 'different-private@example.invalid'})).status, 200, 'private contact guesses do not affect the public retry result');
+  assert.equal((await client.request(endpoint, {...input, body: '改变同一编号的内容'})).status, 409);
+  const stored = await sql('SELECT contact FROM comment_replies;'); assert.equal(stored[0].contact, input.contact);
+  const thread = await client.request(endpoint + '?thread=reply-root'); assert.equal(thread.body.replies[0].body, input.body); assert.equal(JSON.stringify(thread.body).includes(input.contact), false);
+  await stop(); await start();
+  root = (await client.request(endpoint)).body.comments.find(row => row.id === 'reply-root'); assert.equal(root.replies[0].id, input.event);
+});
+test('reply validation, same-course parent, shared write budget and deletion cascade', async () => {
+  await sql("INSERT INTO comments VALUES ('foreign-root','other-course','','','另一课程','2026-10-14T13:28:00Z');");
+  const client = new Client('192.0.2.121');
+  const input = {action: 'reply', parent_id: 'reply-root', body: '匿名回复', event: crypto.randomUUID()};
+  assert.equal((await client.request(endpoint, {...input, parent_id: 'missing'})).status, 404);
+  assert.equal((await client.request(endpoint, {...input, parent_id: 'foreign-root'})).status, 404);
+  assert.equal((await client.request(endpoint + '?thread=foreign-root')).status, 404);
+  assert.equal((await client.request(endpoint, {...input, body: ' '})).status, 400);
+  assert.equal((await client.request(endpoint, {...input, body: 'a'.repeat(1001)})).status, 400);
+  assert.equal((await client.request(endpoint, input, {Origin: 'https://other.invalid'})).status, 403);
+  assert.equal((await client.request(endpoint, input)).status, 200);
+  for (let i = 0; i < 4; i++) assert.equal((await client.request(endpoint, {action: 'comment', body: '共享限流'+i, event: crypto.randomUUID()})).status, 200);
+  assert.equal((await client.request(endpoint, {...input, event: crypto.randomUUID()})).status, 429);
+  await sql("DELETE FROM comments WHERE id='reply-root';");
+  assert.equal((await sql("SELECT COUNT(*) AS n FROM comment_replies WHERE comment_id='reply-root';"))[0].n, 0);
+  assert.equal((await client.request(endpoint + '?thread=reply-root')).status, 404);
+});
+test('bounded preview and cursor pages retain all replies in chronological order without overlap', async () => {
+  await sql("INSERT INTO comments VALUES ('paged-root','skill-engineering','','','多回复问题','2026-10-14T14:00:00Z');" +
+    Array.from({length: 35}, (_, i) => `INSERT INTO comment_replies VALUES ('page-${String(i).padStart(2,'0')}','paged-root','','private-page@example.invalid','回复${i}','2026-10-14T14:01:00Z');`).join(''));
+  const client = new Client('192.0.2.122');
+  const root = (await client.request(endpoint)).body.comments.find(row => row.id === 'paged-root');
+  assert.equal(root.reply_count, 35); assert.equal(root.replies.length, 10); assert.equal(root.has_more_replies, true);
+  const middle = (await client.request(endpoint + '?thread=paged-root&before='+root.reply_before)).body;
+  assert.equal(middle.replies.length, 20); assert.equal(middle.has_more_replies, true);
+  const oldest = (await client.request(endpoint + '?thread=paged-root&before='+middle.reply_before)).body;
+  assert.equal(oldest.replies.length, 5); assert.equal(oldest.has_more_replies, false);
+  const ids = [...oldest.replies, ...middle.replies, ...root.replies].map(row => row.id);
+  assert.equal(new Set(ids).size, 35); assert.deepEqual(ids, [...ids].sort());
+  assert.equal((await client.request(endpoint + '?thread=paged-root&before=wrong')).status, 404);
+  assert.equal(JSON.stringify([root, middle, oldest]).includes('private-page@example.invalid'), false);
 });
