@@ -2,8 +2,8 @@
 
 独立 Portal 仓库负责目录、组装发布、共享留言/点赞与 PV/UV。课程内容由各系列仓库维护；现有 Skill Engineering 源码、PPT/PDF、练习和历史记录保留在 `zhangjian0410/skill-engineering-guide`。
 
-主入口：https://ai-training-portal.pages.dev/
-课程入口：https://ai-training-portal.pages.dev/courses/skill-engineering/
+主入口：https://archer-ai-courses.pages.dev/
+课程入口：https://archer-ai-courses.pages.dev/courses/skill-engineering/
 
 ## 来源和构建
 
