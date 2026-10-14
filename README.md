@@ -19,7 +19,7 @@ npm test
 
 本地可用 `COURSE_SOURCE_DIR=/absolute/course/repository` 复用课程检出；只有已构建课程才设 `SKIP_COURSE_BUILD=1`。无 override 时从登记的公开 GitHub 仓库读取，不需要跨仓库访问 Token。
 
-Portal 的 main 变更通过 Cloudflare Git 集成发布；课程 main 变更由课程既有 Actions 检出本仓库，组装当前课程，再发布同一个 Portal 项目，之后发布旧站兼容入口。旧仓库现有部署 Secret 保留原处，不复制到源码。发布顺序防止先把旧站指向尚未上线的新站。Portal Git 构建需 Node 22、Python 3.11，构建命令 `npm run build && npm run check && npm test`，输出 `dist`。
+Portal 的 main 变更通过 Cloudflare Git 集成发布；课程 main 变更由课程既有 Actions 检出本仓库，组装当前课程，再发布同一个 Portal 项目，之后发布旧站兼容入口。旧仓库现有部署 Secret 保留原处，不复制到源码。发布顺序防止先把旧站指向尚未上线的新站。Portal Git 构建需 Node 22、Python 3.11+，构建命令 `npm run build && npm run check && npm test`，输出 `dist`。
 
 ## 共享数据与旧网址
 
@@ -36,3 +36,7 @@ Portal 的 main 变更通过 Cloudflare Git 集成发布；课程 main 变更由
 回退按已记录 Portal commit 和课程 commit 重新构建发布；旧站 `PORTAL_ORIGIN` 可暂时清空以恢复其静态页面；恢复旧业务后台需要回退旧站到迁移前提交。历史数据不回滚、不重置。Workers Free 和 GitHub 公开标准 runner 沿免费额度，不启用域名购买、视频或模型 API；额度耗尽可能影响互动，静态内容继续可读。
 
 生产只自动构建 main，关闭预览分支部署，避免预览页向共享生产 D1 写入。新增课程的发布工作流也须触发 Portal 组装，不能只登记目录就宣称自动接入。
+
+## 当前发布配置
+
+正式 Pages 项目为 `archer-ai-courses`，连接本公开仓库；main 自动生产部署已启用，预览分支自动部署关闭。构建、同源链接检查与隔离本地 D1 测试通过后发布。共享 D1 绑定与兼容日期由 wrangler.jsonc 维护。Cloudflare 构建使用当前 Version 3 环境，满足上述最低版本；部署记录可通过 build-info.json 核对两个源码仓库的实际 commit。
