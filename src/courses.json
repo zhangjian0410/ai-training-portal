@@ -6,7 +6,7 @@
     "title":"Skill Engineering",
     "description":"先在 Chat 中完成任务，再把方法提炼成 Skill，安装后在新 Chat 中复用。",
     "audience":"面向业务同事，也供技术同事进阶参考",
-    "format":"10 页课件（含海报封面）· 四步跟练",
+    "format":"11 页课件（含海报封面）· 四步跟练",
     "repository":"zhangjian0410/skill-engineering-guide",
     "ref":"main",
     "slides":"index.html#slide-cover",
