@@ -1,0 +1,1 @@
+{"name":"ai-training-portal","version":"1.0.0","private":true,"type":"module","engines":{"node":">=22.16"},"scripts":{"build":"node scripts/build.mjs","check":"node scripts/check-site.mjs","test":"node --test tests/community-api.test.mjs tests/handoff.test.mjs"}}

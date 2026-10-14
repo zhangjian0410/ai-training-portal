@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{SITE_TITLE}} · 课程首页</title><meta name="description" content="{{SITE_DESCRIPTION}}">
+<link rel="stylesheet" href="style.css"><script src="site-interactions.js" type="module"></script>
+</head>
+<body class="portal-page" data-page-id="courses">
+<a class="skip" href="#courses-main">跳到课程目录</a>
+<header class="site-header"><a class="brand" href="courses.html">{{SITE_TITLE}}<span>学习 · 跟练 · 复用</span></a><nav aria-label="课程入口"><a href="#course-list">课程目录</a><a href="#site-metrics">访问统计</a></nav></header>
+<main class="portal-shell" id="courses-main">
+<section class="portal-intro"><p class="lesson-label">开放学习 · 无需登录</p><h1><span>把 AI 用进</span><span>日常工作</span></h1><p class="lead">{{SITE_DESCRIPTION}}</p><p>每门课都从一个实际任务出发，配有在线课件、跟练步骤和参考材料。</p></section>
+<section id="course-list" aria-labelledby="course-list-title"><h2 id="course-list-title">课程目录</h2>{{COURSE_ROWS}}</section>
+<section class="portal-metrics" id="site-metrics" data-site-metrics aria-labelledby="metrics-title"><h2 id="metrics-title">站点访问</h2><dl class="metrics-grid"><div><dt>今日 PV</dt><dd data-metric="today-pv">—</dd></div><div><dt>今日 UV</dt><dd data-metric="today-uv">—</dd></div><div><dt>累计 PV</dt><dd data-metric="total-pv">—</dd></div><div><dt>累计 UV</dt><dd data-metric="total-uv">—</dd></div></dl><p data-metrics-status role="status">开启 JavaScript 后可查看统计。</p><p class="metrics-note">从启用统计开始计数。PV 是页面打开次数，课件翻页不重复计数；UV 按匿名浏览器标识去重，不等同于真实人数。仅统计启用 JavaScript 的访问。</p><noscript><p>开启 JavaScript 后可查看访问统计。</p></noscript></section>
+</main><footer class="portal-footer">后续课程将在这里更新。<span>问题反馈：张坚、李琦</span></footer>
+</body></html>

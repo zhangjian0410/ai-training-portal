@@ -1,0 +1,18 @@
+{
+  "title":"AI 实践课程",
+  "description":"从一次真实任务开始，练习把 AI 用进日常工作。",
+  "courses":[{
+    "id":"skill-engineering",
+    "title":"Skill Engineering",
+    "description":"先在 Chat 中完成任务，再把方法提炼成 Skill，安装后在新 Chat 中复用。",
+    "audience":"面向业务同事，也供技术同事进阶参考",
+    "format":"10 页课件（含海报封面）· 四步跟练",
+    "repository":"zhangjian0410/skill-engineering-guide",
+    "ref":"main",
+    "slides":"index.html#slide-cover",
+    "practice":"deep.html#ticket-practice",
+    "reading":"deep.html",
+    "review":"self-review.html",
+    "poster":"poster.html"
+  }]
+}

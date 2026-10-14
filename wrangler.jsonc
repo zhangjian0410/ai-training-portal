@@ -1,0 +1,6 @@
+{
+  "name":"ai-training-portal",
+  "pages_build_output_dir":"dist",
+  "compatibility_date":"2026-10-13",
+  "d1_databases":[{"binding":"COURSE_DB","database_name":"ai-course-community","database_id":"3972b123-3ece-4c80-84d8-00cc3981a4b3","migrations_dir":"migrations"}]
+}
