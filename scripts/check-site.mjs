@@ -8,5 +8,9 @@ for(const [name,{html}] of pages){for(const match of html.matchAll(/\b(?:href|sr
  const resolved=path.resolve(dist,file);assert.ok(resolved.startsWith(dist+path.sep));assert.ok((await fs.stat(resolved)).isFile(),`${name}: ${file}`);
  if(url.hash)assert.ok(pages.get(file)?.ids.has(decodeURIComponent(url.hash.slice(1))),`${file}${url.hash}`);links++;
 }}
-assert.ok(pages.has('index.html'));assert.ok(pages.has('courses/skill-engineering/index.html'));
+assert.ok(pages.has('index.html'));
+const catalog=JSON.parse(await fs.readFile(path.resolve(import.meta.dirname,'../src/courses.json'),'utf8'));
+for(const course of catalog.courses)assert.ok(pages.has('courses/'+course.id+'/index.html'));
+assert.ok(pages.get('index.html').html.includes('从普通 Chat 开始四步实践'));
+assert.ok(pages.get('index.html').html.includes('观察调用、执行和结果反馈'));
 console.log(`PASS ${pages.size} pages, ${links} same-origin links and existing anchors.`);

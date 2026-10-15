@@ -210,3 +210,20 @@ test('course requests accept anonymous suggestions and ongoing replies in a sepa
   assert.equal((await client.request(url, {action: 'reaction', kind: 'like'})).status, 400);
   assert.equal(JSON.stringify((await new Client('192.0.2.132').request(url)).body).includes(input.contact), false);
 });
+
+test('second course shares backend while comments and reactions stay isolated', async () => {
+  const learner = new Client('192.0.2.40');
+  const second = '/api/feedback/agentic-loop';
+  assert.equal((await learner.request(second)).status, 200);
+  for (const page of ['slides','deep','self-review','poster']) assert.equal((await learner.request('/api/metrics', visit('agentic-loop:'+page))).status,200);
+
+  const event = crypto.randomUUID();
+  assert.equal((await learner.request(second, {action:'comment', event, body:'第二课的工具调用问题', name:'练习同事'})).status, 200);
+  let feedback = (await learner.request(second)).body;
+  assert.ok(feedback.comments.some(row => row.id === event));
+  assert.ok(!(await learner.request(endpoint)).body.comments.some(row => row.id === event));
+  assert.equal((await learner.request(second, {action:'reaction', kind:'like'})).body.mine, 'like');
+  assert.equal((await learner.request(endpoint)).body.mine, null);
+  const cross = await learner.request(endpoint, {action:'reply', event:crypto.randomUUID(), parent_id:event, body:'不应跨课程挂载'});
+  assert.equal(cross.status, 404);
+});
