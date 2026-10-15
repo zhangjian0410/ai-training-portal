@@ -1,0 +1,16 @@
+/* Shared series tokens. Course diagrams keep their authored layout. */
+:root{
+ --ui-color-ink:#082f75;--ui-color-action:#1669db;--ui-color-accent:#479df2;
+ --ui-color-muted:#5274ac;--ui-color-line:#bcddfb;--ui-color-soft:#eef7ff;
+ --ui-color-surface:#fff;--ui-color-page:#f3f8ff;
+ --ui-font-body:"PingFang SC","Microsoft YaHei",Arial,sans-serif;
+ --ui-font-heading:"PingFang SC","Heiti TC","Microsoft YaHei",Arial,sans-serif;
+ --ui-font-code:"SFMono-Regular",Consolas,monospace;
+ --ui-text-small:.875rem;--ui-text-body:1rem;--ui-text-lead:1.25rem;
+ --ui-space-1:4px;--ui-space-2:8px;--ui-space-3:12px;--ui-space-4:16px;--ui-space-6:24px;--ui-space-8:32px;--ui-space-12:48px;
+ --ui-radius-control:6px;--ui-radius-panel:10px;--ui-control-height:44px;
+ --ui-width-reading:940px;--ui-width-portal:1160px;
+ --navy:var(--ui-color-ink);--blue:var(--ui-color-action);--cyan:var(--ui-color-accent);
+ --soft:var(--ui-color-soft);--line:var(--ui-color-line);--muted:var(--ui-color-muted);
+ font-family:var(--ui-font-body);color:var(--ui-color-ink);background:var(--ui-color-page);
+}

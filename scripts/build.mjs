@@ -1,4 +1,6 @@
 import fs from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+import {applyCourseShell} from './course-shell.mjs';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
 const root=path.resolve(import.meta.dirname,'..');
@@ -6,6 +8,8 @@ const catalog=JSON.parse(await fs.readFile(path.join(root,'src/courses.json'),'u
 const dist=path.join(root,'dist');
 const e=value=>String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
 const ids=new Set();const builds=[];
+const sharedAssets=['ui-tokens.css','course-shell.css','course-shell.js','course-player.js'];
+const uiVersion=createHash('sha256').update((await Promise.all(sharedAssets.map(file=>fs.readFile(path.join(root,'src',file))))).map(b=>b.toString()).join('')).digest('hex').slice(0,16);
 const localSources=JSON.parse(process.env.COURSE_SOURCE_DIRS||'{}');
 await fs.rm(dist,{recursive:true,force:true});await fs.mkdir(dist,{recursive:true});
 for(const course of catalog.courses){
@@ -31,6 +35,7 @@ for(const course of catalog.courses){
   let html=await fs.readFile(file,'utf8');
   html=html.replaceAll('href="courses.html"','href="/"').replaceAll('src="site-interactions.js"','src="/site-interactions.js"');
   html=html.replace('</head>','<link rel="stylesheet" href="/community.css">\n</head>');
+  html=applyCourseShell(html,course,name,catalog.courses[catalog.courses.indexOf(course)+1],uiVersion);
   await fs.writeFile(file,html);
  }
  builds.push({id:course.id,repository:course.repository,revision,path:'/courses/'+course.id+'/'});
@@ -53,9 +58,10 @@ const rows=catalog.courses.map(course=>{
 }).join('');
 let html=await fs.readFile(path.join(root,'src/courses-template.html'),'utf8');
 html=html.replaceAll('{{SITE_TITLE}}',e(catalog.title)).replaceAll('{{SITE_DESCRIPTION}}',e(catalog.description)).replaceAll('{{COURSE_ROWS}}',rows).replaceAll('href="courses.html"','href="/"');
+html=html.replace('</head>',`<link rel="stylesheet" href="/ui-tokens.css?v=${uiVersion}"><link rel="stylesheet" href="/course-shell.css?v=${uiVersion}"></head>`);
 await fs.writeFile(path.join(dist,'index.html'),html);
-for(const name of ['style.css','site-interactions.js','community.css'])await fs.copyFile(path.join(root,'src',name),path.join(dist,name));
+for(const name of ['style.css','site-interactions.js','community.css',...sharedAssets])await fs.copyFile(path.join(root,'src',name),path.join(dist,name));
 await fs.writeFile(path.join(dist,'_routes.json'),JSON.stringify({version:1,include:['/api/*','/__handoff'],exclude:[]},null,2)+'\n');
 await fs.writeFile(path.join(dist,'_redirects'),'/courses / 302\n/courses.html / 302\n');
-await fs.writeFile(path.join(dist,'build-info.json'),JSON.stringify({portalRevision:process.env.CF_PAGES_COMMIT_SHA||process.env.PORTAL_REVISION||'local',courses:builds},null,2)+'\n');
+await fs.writeFile(path.join(dist,'build-info.json'),JSON.stringify({portalRevision:process.env.CF_PAGES_COMMIT_SHA||process.env.PORTAL_REVISION||'local',courses:builds,uiVersion},null,2)+'\n');
 console.log('Built independent Portal and '+builds.length+' same-origin course(s).');

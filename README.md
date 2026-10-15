@@ -60,3 +60,7 @@ Portal 的 main 变更通过 Cloudflare Git 集成发布；课程 main 变更由
 课程仓库发布新标签后，在本仓库更新对应 `ref` 并提交；这个提交触发 Portal 原生 Git 自动构建。新课程单独提交但未更新 Portal 引用时，正式网站保持当前版本。`build-info.json` 记录每门课实际组装的 commit。
 
 本地多课程检查可使用 `COURSE_SOURCE_DIRS` JSON 对象，按课程 ID 指向各自源码目录。这仅是本地构建覆盖，不更改生产来源。
+
+## 课程交互与视觉
+
+正式站点的导航、资料菜单、播放行为、末页后续路线和视觉令牌由 Portal 共用实现。两门课程使用相同入口顺序与操作样式；内容、图解和导出文件仍由课程仓库维护。实现位置、令牌取值、新课程接入及验证方式见 [课程系列界面约定](docs/course-interface.md)。`build-info.json` 的 `uiVersion` 用于核对共享界面版本。
