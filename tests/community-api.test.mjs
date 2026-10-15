@@ -190,3 +190,23 @@ test('bounded preview and cursor pages retain all replies in chronological order
   assert.equal((await client.request(endpoint + '?thread=paged-root&before=wrong')).status, 404);
   assert.equal(JSON.stringify([root, middle, oldest]).includes('private-page@example.invalid'), false);
 });
+
+test('course requests accept anonymous suggestions and ongoing replies in a separate scope', async () => {
+  const url = '/api/feedback/course-requests';
+  const client = new Client('192.0.2.131');
+  assert.equal((await client.request(url)).status, 200);
+  const input = comment('希望学习如何整理客户会议纪要。', {contact: 'request-private@example.invalid'});
+  let result = await client.request(url, input);
+  assert.equal(result.status, 200);
+  assert.equal(result.body.comments[0].body, input.body);
+  assert.equal(result.body.comments[0].name, '');
+  assert.equal(JSON.stringify(result.body).includes(input.contact), false);
+  await client.request(url, {action: 'reply', parent_id: input.event, body: '还希望能生成待办。', event: crypto.randomUUID()});
+  result = await client.request(url, {action: 'reply', parent_id: input.event, body: '可以补充一个客户跟进场景。', event: crypto.randomUUID()});
+  assert.equal(result.body.comments[0].reply_count, 2);
+  assert.equal((await client.request(endpoint)).body.comments.some(row => row.id === input.event), false);
+  assert.equal((await client.request(endpoint, {action: 'reply', parent_id: input.event, body: '跨区回复', event: crypto.randomUUID()})).status, 404);
+  assert.equal((await client.request(url, {action: 'reply', parent_id: 'paged-root', body: '跨区回复', event: crypto.randomUUID()})).status, 404);
+  assert.equal((await client.request(url, {action: 'reaction', kind: 'like'})).status, 400);
+  assert.equal(JSON.stringify((await new Client('192.0.2.132').request(url)).body).includes(input.contact), false);
+});

@@ -8,4 +8,6 @@
 .reply-form legend{font-size:16px;overflow-wrap:anywhere}
 .reply-actions{display:flex;gap:12px;flex-wrap:wrap}
 .reply-form .reply-cancel{background:white;color:var(--muted);border:1px solid var(--line)}
+.portal-shell .course-requests{max-width:none;margin:42px 0 8px;scroll-margin-top:24px}
+.course-requests .feedback-intro{margin-bottom:24px}
 @media(max-width:850px){.comment-thread{margin-left:4px;padding-left:12px}.reply-form{padding:16px 12px}.reply-form .comment-optional{gap:12px}}

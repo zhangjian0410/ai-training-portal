@@ -3,14 +3,22 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{{SITE_TITLE}} · 课程首页</title><meta name="description" content="{{SITE_DESCRIPTION}}">
-<link rel="stylesheet" href="style.css"><script src="site-interactions.js" type="module"></script>
+<link rel="stylesheet" href="style.css"><link rel="stylesheet" href="community.css"><script src="site-interactions.js" type="module"></script>
 </head>
 <body class="portal-page" data-page-id="courses">
 <a class="skip" href="#courses-main">跳到课程目录</a>
-<header class="site-header"><a class="brand" href="courses.html">{{SITE_TITLE}}<span>学习 · 跟练 · 复用</span></a><nav aria-label="课程入口"><a href="#course-list">课程目录</a><a href="#site-metrics">访问统计</a></nav></header>
+<header class="site-header"><a class="brand" href="courses.html">{{SITE_TITLE}}<span>学习 · 跟练 · 复用</span></a><nav aria-label="课程入口"><a href="#course-list">课程目录</a><a href="#course-requests">想学什么</a><a href="#site-metrics">访问统计</a></nav></header>
 <main class="portal-shell" id="courses-main">
 <section class="portal-intro"><p class="lesson-label">开放学习 · 无需登录</p><h1><span>把 AI 用进</span><span>日常工作</span></h1><p class="lead">{{SITE_DESCRIPTION}}</p><p>每门课都从一个实际任务出发，配有在线课件、跟练步骤和参考材料。</p></section>
 <section id="course-list" aria-labelledby="course-list-title"><h2 id="course-list-title">课程目录</h2>{{COURSE_ROWS}}</section>
+<section class="course-feedback course-requests" id="course-requests" data-feedback-course="course-requests" aria-labelledby="requests-title">
+<div class="feedback-intro"><p class="lesson-label">一起决定接下来学什么</p><h2 id="requests-title">下一门课，你想学什么？</h2><p>告诉我们你想学的主题，或者工作中希望用 AI 解决的问题。可以接着其他人的建议补充场景，我们会参考大家的反馈安排后续课程。</p></div>
+<form class="comment-form"><fieldset><legend>留下你的课程建议</legend>
+<label for="comment-body">想学什么 <span>必填 · 最多 1000 字</span></label><textarea id="comment-body" name="body" required maxlength="1000" rows="4" placeholder="例如：想学用 AI 整理客户会议纪要，自动列出待办和负责人。"></textarea>
+<div class="comment-optional"><div><label for="comment-name">称呼 <span>选填 · 会公开</span></label><input id="comment-name" name="name" maxlength="40" placeholder="昵称即可" autocomplete="nickname"></div><div><label for="comment-contact">联系方式 <span>选填 · 仅讲师可见</span></label><input id="comment-contact" name="contact" maxlength="200" placeholder="邮箱、微信或其他方便联系的方式" autocomplete="off"></div></div>
+<p class="contact-note">无需登录，也不用实名。建议和称呼会公开；联系方式选填，不会展示在页面上。</p><button type="submit" disabled>发布课程建议</button></fieldset></form>
+<p class="feedback-status" data-feedback-status role="status">开启 JavaScript 后可提出课程建议。</p><ul class="comment-list" data-comments aria-label="近期课程建议"></ul><noscript><p>开启 JavaScript 后可提出课程建议和回复。</p></noscript>
+</section>
 <section class="portal-metrics" id="site-metrics" data-site-metrics aria-labelledby="metrics-title"><h2 id="metrics-title">站点访问</h2><dl class="metrics-grid"><div><dt>今日 PV</dt><dd data-metric="today-pv">—</dd></div><div><dt>今日 UV</dt><dd data-metric="today-uv">—</dd></div><div><dt>累计 PV</dt><dd data-metric="total-pv">—</dd></div><div><dt>累计 UV</dt><dd data-metric="total-uv">—</dd></div></dl><p data-metrics-status role="status">开启 JavaScript 后可查看统计。</p><p class="metrics-note">从启用统计开始计数。PV 是页面打开次数，课件翻页不重复计数；UV 按匿名浏览器标识去重，不等同于真实人数。仅统计启用 JavaScript 的访问。</p><noscript><p>开启 JavaScript 后可查看访问统计。</p></noscript></section>
 </main><footer class="portal-footer">后续课程将在这里更新。<span>问题反馈：张坚、李琦</span></footer>
 </body></html>

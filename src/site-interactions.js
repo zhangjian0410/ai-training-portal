@@ -26,6 +26,7 @@ async function setupFeedback() {
   const section = document.querySelector('[data-feedback-course]');
   if (!section) return;
   const url = `/api/feedback/${encodeURIComponent(section.dataset.feedbackCourse)}`;
+  const isRequests = section.dataset.feedbackCourse === 'course-requests';
   const status = section.querySelector('[data-feedback-status]');
   const form = section.querySelector('form');
   const reactions = [...section.querySelectorAll('[data-reaction]')];
@@ -36,7 +37,7 @@ async function setupFeedback() {
   replyForm.className = 'comment-form reply-form';
   replyForm.id = 'reply-editor'; replyForm.hidden = true;
   // Only constant markup goes through innerHTML; all user text uses textContent.
-  replyForm.innerHTML = `<fieldset><legend>回复 <span data-reply-target></span></legend>
+  replyForm.innerHTML = `<fieldset><legend>参与讨论 · <span data-reply-target></span>的留言</legend>
     <label for="reply-body">回复内容 <span>必填 · 最多 1000 字</span></label>
     <textarea id="reply-body" name="body" required maxlength="1000" rows="3" placeholder="接着这条留言聊聊你的看法。"></textarea>
     <div class="comment-optional"><div><label for="reply-name">称呼 <span>选填 · 会公开</span></label><input id="reply-name" name="name" maxlength="40" placeholder="昵称即可" autocomplete="nickname"></div>
@@ -94,7 +95,14 @@ async function setupFeedback() {
     const discussion = document.createElement('div'); discussion.className = 'comment-thread';
     const title = document.createElement('p'); title.className = 'thread-title'; title.textContent = `${comment.reply_count} 条回复`;
     const replies = document.createElement('ul'); replies.className = 'reply-list'; replies.setAttribute('aria-label', `${comment.name || '匿名同事'}的留言回复`);
-    for (const row of thread.replies) replies.append(messageNode(row));
+    for (const row of thread.replies) {
+      const reply = messageNode(row);
+      const button = document.createElement('button'); button.type = 'button';
+      button.className = 'comment-reply-button'; button.textContent = '继续回复';
+      button.setAttribute('aria-controls', 'reply-editor'); button.setAttribute('aria-expanded', 'false');
+      button.addEventListener('click', () => openReply(comment, item, button));
+      reply.append(button); replies.append(reply);
+    }
     discussion.append(title);
     if (thread.hasMore) {
       const more = document.createElement('button'); more.type = 'button'; more.className = 'reply-more'; more.textContent = '查看更早回复';
@@ -121,7 +129,8 @@ async function setupFeedback() {
     });
     list.replaceChildren();
     if (!data.comments.length) {
-      const empty = document.createElement('li'); empty.className = 'empty-comments'; empty.textContent = '还没有留言。可以说说哪里有用、哪里需要改进。'; list.append(empty);
+      const empty = document.createElement('li'); empty.className = 'empty-comments';
+      empty.textContent = isRequests ? '还没有课程建议。欢迎留下你想学的主题或工作中遇到的难题。' : '还没有留言。可以说说哪里有用、哪里需要改进。'; list.append(empty);
     }
     let attached = false;
     for (const comment of data.comments) {
@@ -167,8 +176,8 @@ async function setupFeedback() {
     } catch (error) {replyStatus.textContent = error.message;}
     finally {busy(false);}
   });
-  status.textContent = '正在读取课程反馈…'; busy(true);
-  try {render(await api(url)); busy(false); status.textContent = '无需登录，欢迎点赞、拍砖、留言或回复。';}
+  status.textContent = isRequests ? '正在读取课程建议…' : '正在读取课程反馈…'; busy(true);
+  try {render(await api(url)); busy(false); status.textContent = isRequests ? '无需登录，欢迎提出课程建议，也可以接着其他人的建议讨论。' : '无需登录，欢迎点赞、拍砖、留言或回复。同一条留言下可以来回讨论。';}
   catch {status.textContent = '反馈暂时无法加载，稍后刷新可重试。';}
 }
 // Establish the shared anonymous cookie before loading the discussion widget.

@@ -73,7 +73,8 @@ async function createReply(db, request, course, input) {
 export async function onRequest({request, env, params}) {
   try {
     const course = params.course;
-    if (!catalog.courses.some(item => item.id === course)) throw new HttpError(404, '课程不存在。');
+    const isRequests = course === 'course-requests';
+    if (!isRequests && !catalog.courses.some(item => item.id === course)) throw new HttpError(404, '课程不存在。');
     if (!env.COURSE_DB) throw new Error('Missing database binding');
     const id = identity(request); const db = env.COURSE_DB;
     if (request.method === 'GET') {
@@ -85,6 +86,7 @@ export async function onRequest({request, env, params}) {
     checkWrite(request);
     const input = await readJSON(request);
     if (input.action === 'reaction') {
+      if (isRequests) throw new HttpError(400, '请用留言提出课程建议。');
       if (![null, 'like', 'brick'].includes(input.kind)) throw new HttpError(400, '请选择点赞或拍砖。');
       await rateLimit(db, request, 'reaction', 30);
       if (input.kind === null) await db.prepare('DELETE FROM reactions WHERE course_id=? AND visitor=?').bind(course, id.visitor).run();
