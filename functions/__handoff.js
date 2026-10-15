@@ -3,7 +3,7 @@ import {identity} from './_shared.js';
 const uuid=/^[a-f0-9-]{36}$/;
 export function safeNext(value){
  let url;try{url=new URL(value||'/','https://portal.invalid');}catch{return '/';}
- const allowed=['/',...catalog.courses.flatMap(c=>['','index.html','deep','deep.html','self-review','self-review.html','poster','poster.html'].map(p=>'/courses/'+c.id+'/'+p))];
+ const allowed=['/',...catalog.courses.flatMap(c=>['','index.html','deep','deep.html','practice','practice.html','self-review','self-review.html','poster','poster.html'].map(p=>'/courses/'+c.id+'/'+p))];
  return url.origin==='https://portal.invalid'&&allowed.includes(url.pathname)?url.pathname+url.search:'/';
 }
 export async function onRequest({request,env}){

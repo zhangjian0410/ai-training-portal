@@ -20,12 +20,12 @@
       "id": "agentic-loop",
       "title": "用 Qoder 搭建你的第一个 AI Agent",
       "description": "先做工作日 API，再做对话 AI，最后亲手接通模型调用工具的 Agentic 循环。",
-      "audience": "面向业务同事，用 Qoder 编码，使用自己的 DeepSeek API Key",
-      "format": "11 页课件 · 三步跟练 · Flash / Pro 可选",
+      "audience": "面向业务同事，用 Qoder 编码，可选兼容格式的模型 API",
+      "format": "14 页图文课件 · 三步跟练 · 真实操作截图",
       "repository": "zhangjian0410/agentic-loop-course",
-      "ref": "v1.0.0",
+      "ref": "v1.1.0",
       "slides": "index.html#slide-cover",
-      "practice": "deep.html#start",
+      "practice": "practice.html#start",
       "reading": "deep.html",
       "review": "self-review.html",
       "poster": "poster.html",
@@ -38,17 +38,17 @@
         {
           "label": "做 API",
           "description": "独立查到工作日和补班日期",
-          "path": "deep.html#step-1"
+          "path": "practice.html#step-1"
         },
         {
           "label": "搭聊天",
-          "description": "连接 DeepSeek，验证连续对话",
-          "path": "deep.html#step-2"
+          "description": "连接自己的模型服务，验证连续对话",
+          "path": "practice.html#step-2"
         },
         {
           "label": "接工具",
           "description": "观察调用、执行和结果反馈",
-          "path": "deep.html#step-3"
+          "path": "practice.html#step-3"
         }
       ],
       "materials": [

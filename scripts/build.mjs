@@ -25,8 +25,9 @@ for(const course of catalog.courses){
  const destination=path.join(dist,'courses',course.id);
  await fs.cp(path.join(source,'dist'),destination,{recursive:true});
  for(const excluded of ['_routes.json','courses.html','site-interactions.js'])await fs.rm(path.join(destination,excluded),{force:true});
- for(const name of ['index.html','deep.html','self-review.html','poster.html']){
+ for(const name of ['index.html','deep.html','practice.html','self-review.html','poster.html']){
   const file=path.join(destination,name);
+  if(name==='practice.html' && !await fs.stat(file).catch(()=>null))continue;
   let html=await fs.readFile(file,'utf8');
   html=html.replaceAll('href="courses.html"','href="/"').replaceAll('src="site-interactions.js"','src="/site-interactions.js"');
   html=html.replace('</head>','<link rel="stylesheet" href="/community.css">\n</head>');
