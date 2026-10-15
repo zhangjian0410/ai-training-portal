@@ -28,7 +28,7 @@ try{
   const copy=p.locator('[data-copy]').first();const details=copy.locator('xpath=ancestor::details');for(let n=0;n<await details.count();n++){const d=details.nth(n);if(!await d.getAttribute('open'))await d.locator(':scope > summary').click();}await copy.click();await p.getByText('已复制',{exact:true}).first().waitFor();
   assert.ok(await p.locator('body').evaluate(e=>e.scrollWidth<=innerWidth));await p.screenshot({path:out+`/${id}-practice-${width}.png`});
   await p.locator('[data-course-nav="reading"]').click();await p.waitForLoadState();assert.ok(await p.locator('[data-course-nav="reading"]').getAttribute('aria-current'));
-  await p.locator('[data-course-nav="review"]').click();assert.ok(await p.locator('.course-next').isVisible());assert.ok(await p.locator('body').evaluate(e=>e.scrollWidth<=innerWidth));
+  await p.locator('[data-course-nav="review"]').click();await p.waitForURL(/\/self-review(?:\.html)?$/);await p.locator('.course-next').waitFor({state:'visible'});assert.ok(await p.locator('body').evaluate(e=>e.scrollWidth<=innerWidth));
   const control=await p.locator('.course-next .ui-primary').boundingBox();assert.ok(control.height>=44);
   reports.push({width,id,status:'PASS'});
  }
