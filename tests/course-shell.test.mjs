@@ -7,8 +7,8 @@ test('both assembled courses share navigation, tokens, playback and reachable ne
    const html=await fs.readFile(`${root}/dist/courses/${c.id}/${page}`,'utf8');
    assert.ok(html.includes('src="/course-shell.js?v='));assert.ok(html.includes('href="/ui-tokens.css?v='));
    const header=html.match(/<header[\s\S]*?<\/header>/)[0];
-   for(const label of ['课程目录','课件','跟练','深入阅读',c.ui.reviewLabel,'资料下载'])assert.ok(header.includes(label));
-   const labels=[...header.matchAll(/data-course-nav="([^"]+)"/g)].map(m=>m[1]);assert.deepEqual(labels,['slides','practice','reading','review']);
+   for(const label of ['课程目录','看课件','动手做','深入阅读','学习资料'])assert.ok(header.includes(label));
+   const labels=[...header.matchAll(/data-course-nav="([^"]+)"/g)].map(m=>m[1]);assert.deepEqual(labels,c.id==='skill-engineering'?['slides','practice','reading','review']:['slides','practice','reading']);
    if(page==='index.html'){assert.ok(html.includes('src="/course-player.js?v='));assert.ok(html.includes('data-course-end hidden'));assert.ok(html.includes('class="deck-next-action"'));assert.ok(!html.includes('src="app.js"'));}
    if(page==='self-review.html')assert.ok(html.includes('交流与反馈'));
   }
