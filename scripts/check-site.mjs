@@ -15,5 +15,5 @@ for(const course of catalog.courses){
  assert.deepEqual(course.routes.map(r=>r.path),[course.slides,course.practice]);
  assert.ok(pages.get('index.html').html.includes('/courses/'+course.id+'/'+course.practice));
 }
-assert.ok(pages.get('courses/agentic-loop/practice.html').ids.has('done'));
+for(const c of catalog.courses)assert.ok(pages.get('courses/'+c.id+'/practice.html').ids.has('done'));
 console.log(`PASS ${pages.size} pages, ${links} same-origin links and existing anchors.`);

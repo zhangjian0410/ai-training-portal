@@ -11,7 +11,7 @@
       "repository": "zhangjian0410/skill-engineering-guide",
       "ref": "main",
       "slides": "index.html#slide-cover",
-      "practice": "deep.html#ticket-practice",
+      "practice": "practice.html#start",
       "reading": "deep.html",
       "review": "self-review.html",
       "poster": "poster.html",
@@ -44,7 +44,8 @@
             "path": "poster.html",
             "download": false
           }
-        ]
+        ],
+        "advanced": "advanced.html#start"
       },
       "routes": [
         {
@@ -55,7 +56,7 @@
         {
           "label": "动手做",
           "description": "从准备开始，按步骤完成并检查",
-          "path": "deep.html#ticket-practice"
+          "path": "practice.html#start"
         }
       ],
       "materials": [
@@ -64,8 +65,8 @@
           "path": "deep.html"
         },
         {
-          "label": "自评 Skill（进阶）",
-          "path": "self-review.html"
+          "label": "进阶跟练（选做）",
+          "path": "advanced.html#start"
         }
       ]
     },

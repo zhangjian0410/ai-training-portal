@@ -24,14 +24,24 @@ try{
    await p.screenshot({path:out+`/${id}-end-${width}.png`});await p.evaluate(()=>document.exitFullscreen());
    assert.ok(await p.locator('[data-course-end]').isVisible());await p.locator('#first').click();assert.ok(await p.locator('[data-course-end]').isHidden());await p.locator('#contents-toggle').click();assert.equal(await p.locator('#contents a').count(),count);await p.keyboard.press('Escape');
   }
-  await p.locator('[data-course-nav="practice"]').click();await p.waitForLoadState();assert.equal(await p.locator('[data-course-nav="practice"]').getAttribute('aria-current'),id==='skill-engineering'?'location':'page');
+  await p.locator('[data-course-nav="practice"]').click();await p.waitForLoadState();assert.equal(await p.locator('[data-course-nav="practice"]').getAttribute('aria-current'),'page');
   const copy=p.locator('[data-copy]').first();const details=copy.locator('xpath=ancestor::details');for(let n=0;n<await details.count();n++){const d=details.nth(n);if(!await d.getAttribute('open'))await d.locator(':scope > summary').click();}await copy.click();await p.getByText('已复制',{exact:true}).first().waitFor();
   assert.ok(await p.locator('body').evaluate(e=>e.scrollWidth<=innerWidth));await p.screenshot({path:out+`/${id}-practice-${width}.png`});
   await p.locator('.course-resources summary').click();await p.locator('[data-course-nav="reading"]').click();await p.waitForLoadState();assert.ok(await p.locator('[data-course-nav="reading"]').getAttribute('aria-current'));
   // Current optional section stays identifiable with the menu both closed and open.
   const menuMark=await p.locator('.course-resources summary').evaluate(e=>getComputedStyle(e).boxShadow);assert.notEqual(menuMark,'none');
   await p.locator('.course-resources summary').click();assert.notEqual(await p.locator('[data-course-nav="reading"]').evaluate(e=>getComputedStyle(e).boxShadow),'none');await p.keyboard.press('Escape');
-  if(id==='skill-engineering'){await p.locator('.course-resources summary').click();await p.locator('[data-course-nav="review"]').click();await p.waitForURL(/\/self-review(?:\.html)?$/);}else{await p.locator('[data-course-nav="practice"]').click();await p.getByRole('link',{name:'完成检查',exact:true}).click();await p.locator('#done table').waitFor();assert.equal(await p.locator('#done tbody tr').count(),7);}await p.locator('.course-next').waitFor({state:'visible'});assert.ok(await p.locator('body').evaluate(e=>e.scrollWidth<=innerWidth));
+  await p.locator('[data-course-nav="practice"]').click();await p.getByRole('link',{name:'完成检查',exact:true}).click();await p.locator('#done table').waitFor();assert.equal(await p.locator('#done tbody tr').count(),id==='skill-engineering'?5:7);
+  if(id==='skill-engineering'){
+   // Advanced operations are optional and only entered after the basic completion section.
+   await p.locator('#done a[href="advanced.html#start"]').click();await p.waitForURL(/\/advanced(?:\.html)?#start$/);
+   assert.equal(await p.locator('[data-course-nav="advanced"]').getAttribute('aria-current'),'page');
+   const advancedCopy=p.locator('[data-copy="regression-plan"]');await advancedCopy.locator('xpath=ancestor::details').locator(':scope > summary').click();await advancedCopy.click();await p.getByText('已复制',{exact:true}).first().waitFor();
+   await p.locator('a[href="self-review.html"]').first().click();await p.waitForURL(/\/self-review(?:\.html)?$/);assert.ok(await p.locator('[data-course-nav="advanced"]').getAttribute('aria-current'));
+   await p.goto(url+'deep.html#ticket-practice');await p.waitForURL(/\/practice(?:\.html)?#ticket-practice$/);assert.ok(await p.locator('#chat-task').count());
+   await p.goto(url+'deep.html#verification-prep');await p.waitForURL(/\/advanced(?:\.html)?#verification-prep$/);
+  }
+  await p.locator('.course-next').waitFor({state:'visible'});assert.ok(await p.locator('body').evaluate(e=>e.scrollWidth<=innerWidth));
   const control=await p.locator('.course-next .ui-primary').boundingBox();assert.ok(control.height>=44);
   reports.push({width,id,status:'PASS'});
  }
