@@ -217,6 +217,14 @@ test('second course shares backend while comments and reactions stay isolated', 
   assert.equal((await learner.request(second)).status, 200);
   for (const page of ['slides','deep','practice','self-review','poster']) assert.equal((await learner.request('/api/metrics', visit('agentic-loop:'+page))).status,200);
 
+  const beforeAdvanced = (await learner.request('/api/metrics')).body;
+  const advanced = await learner.request('/api/metrics', visit('skill-engineering:advanced'));
+  assert.equal(advanced.status, 200);
+  assert.equal(advanced.body.total.pv, beforeAdvanced.total.pv + 1);
+  assert.equal(advanced.body.total.uv, beforeAdvanced.total.uv);
+  assert.equal(advanced.body.today.uv, beforeAdvanced.today.uv);
+  assert.equal((await learner.request('/api/metrics', visit('agentic-loop:advanced'))).status, 400);
+
   const event = crypto.randomUUID();
   assert.equal((await learner.request(second, {action:'comment', event, body:'第二课的工具调用问题', name:'练习同事'})).status, 200);
   let feedback = (await learner.request(second)).body;

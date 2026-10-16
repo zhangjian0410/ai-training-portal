@@ -16,7 +16,7 @@ export async function onRequest({request, env}) {
     if (request.method !== 'POST') throw new HttpError(405, '不支持此请求。');
     checkWrite(request);
     const input = await readJSON(request);
-    const pages = ['courses', ...catalog.courses.flatMap(course => ['slides','deep','practice','poster','self-review'].map(page => `${course.id}:${page}`))];
+    const pages = ['courses', ...catalog.courses.flatMap(course => ['slides','deep','practice','poster','self-review',...(course.ui?.advanced?['advanced']:[])].map(page => `${course.id}:${page}`))];
     if (!pages.includes(input.page) || typeof input.event !== 'string' || !/^[a-f0-9-]{36}$/.test(input.event)) throw new HttpError(400, '访问记录格式不正确。');
     await rateLimit(db, request, 'metrics', 300);
     await db.prepare('INSERT OR IGNORE INTO page_events(id,page,visitor,day) VALUES (?,?,?,?)').bind(input.event, input.page, id.visitor, day).run();
