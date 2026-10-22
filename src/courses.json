@@ -124,6 +124,118 @@
           }
         ]
       }
+    },
+    {
+      "id": "qwen-office-basics",
+      "title": "千问办公 · 新人培训（基础篇）",
+      "description": "一句话，把活儿干完——从对话到可交付的 Office 成品",
+      "audience": "新入职同事，第一次接触千问办公；日常离不开 Office 与钉钉",
+      "format": "18 页图文课件（含封面与结语）· 5 个跟练任务",
+      "repository": "zhangjian0410/qwen-office-basics-course",
+      "ref": "v2.0.1",
+      "slides": "index.html#slide-cover",
+      "practice": "practice.html#start",
+      "reading": "deep.html",
+      "review": "self-review.html",
+      "poster": "poster.html",
+      "routes": [
+        {
+          "label": "看课件",
+          "description": "先了解这门课要完成什么",
+          "path": "index.html#slide-cover"
+        },
+        {
+          "label": "动手做",
+          "description": "从准备开始，按步骤完成并检查",
+          "path": "practice.html#start"
+        }
+      ],
+      "materials": [
+        {
+          "label": "深入阅读（选读）",
+          "path": "deep.html"
+        }
+      ],
+      "ui": {
+        "shortTitle": "千问办公·基础",
+        "reviewLabel": "自测清单",
+        "downloads": [
+          {
+            "label": "课件 PDF",
+            "path": "downloads/qwen-office-basics.pdf"
+          },
+          {
+            "label": "PPTX",
+            "path": "downloads/qwen-office-basics.pptx"
+          },
+          {
+            "label": "在线查看总览",
+            "path": "poster.html",
+            "download": false
+          },
+          {
+            "label": "自测清单",
+            "path": "self-review.html",
+            "download": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "qwen-office-advanced",
+      "title": "千问办公 · 新人培训（进阶篇）",
+      "description": "从个人提效到团队复用：分步、网页交付、数据源与技能编排",
+      "audience": "已跑通基础四步，想把单点提效变成团队可复用流程的同事",
+      "format": "18 页图文课件（含封面与结语）· 6 个跟练任务",
+      "repository": "zhangjian0410/qwen-office-advanced-course",
+      "ref": "v2.0.1",
+      "slides": "index.html#slide-cover",
+      "practice": "practice.html#start",
+      "reading": "deep.html",
+      "review": "self-review.html",
+      "poster": "poster.html",
+      "routes": [
+        {
+          "label": "看课件",
+          "description": "先了解这门课要完成什么",
+          "path": "index.html#slide-cover"
+        },
+        {
+          "label": "动手做",
+          "description": "从准备开始，按步骤完成并检查",
+          "path": "practice.html#start"
+        }
+      ],
+      "materials": [
+        {
+          "label": "深入阅读（选读）",
+          "path": "deep.html"
+        }
+      ],
+      "ui": {
+        "shortTitle": "千问办公·进阶",
+        "reviewLabel": "自测清单",
+        "downloads": [
+          {
+            "label": "课件 PDF",
+            "path": "downloads/qwen-office-advanced.pdf"
+          },
+          {
+            "label": "PPTX",
+            "path": "downloads/qwen-office-advanced.pptx"
+          },
+          {
+            "label": "在线查看总览",
+            "path": "poster.html",
+            "download": false
+          },
+          {
+            "label": "自测清单",
+            "path": "self-review.html",
+            "download": false
+          }
+        ]
+      }
     }
   ]
 }

@@ -49,7 +49,9 @@ html:fullscreen .course-next{display:none}
  .site-header .brand span{max-width:none;font-size:12px}
  .site-header nav{justify-content:flex-start;gap:var(--ui-space-1);margin-top:var(--ui-space-3);max-width:none;font-size:var(--ui-text-small)}
  .site-header nav>button{display:none}
- .course-resources>div{left:0;right:auto;min-width:210px}
+ .site-header nav{position:relative}
+ .course-resources{position:static}
+ .course-resources>div{left:auto;right:0;top:100%;min-width:210px}
  .reading{padding:var(--ui-space-8) var(--ui-space-6)}
  .reading h2{font-size:24px}
  .course-next{margin:var(--ui-space-6) var(--ui-space-4);padding:var(--ui-space-6)}

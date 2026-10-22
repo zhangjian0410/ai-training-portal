@@ -235,3 +235,25 @@ test('second course shares backend while comments and reactions stay isolated', 
   const cross = await learner.request(endpoint, {action:'reply', event:crypto.randomUUID(), parent_id:event, body:'不应跨课程挂载'});
   assert.equal(cross.status, 404);
 });
+
+test('Qwen courses share visitor deduplication and isolate comments, replies and reactions',async()=>{
+ const learner=new Client('192.0.2.150');let visitorUv;
+ for(const id of ['qwen-office-basics','qwen-office-advanced']){
+  const scope='/api/feedback/'+id;
+  assert.equal((await learner.request(scope)).status,200);
+  for(const page of ['slides','deep','practice','poster','self-review']){
+   const r=await learner.request('/api/metrics',visit(id+':'+page));assert.equal(r.status,200);
+   visitorUv??=r.body.total.uv;assert.equal(r.body.total.uv,visitorUv);
+  }
+  const root=comment('本地测试：'+id,{name:'试学',contact:'local-only@example.invalid'});
+  assert.equal((await learner.request(scope,root)).status,200);
+  const reply=await learner.request(scope,{action:'reply',parent_id:root.event,event:crypto.randomUUID(),body:'继续讨论'});
+  assert.equal(reply.status,200);assert.equal(reply.body.comments.find(c=>c.id===root.event).reply_count,1);
+  assert.ok(!JSON.stringify(reply.body).includes(root.contact));
+  assert.equal((await learner.request(scope,{action:'reaction',kind:'like'})).body.mine,'like');
+  for(const foreign of ['skill-engineering',id==='qwen-office-basics'?'qwen-office-advanced':'qwen-office-basics']){
+   assert.ok(!(await learner.request('/api/feedback/'+foreign)).body.comments.some(c=>c.id===root.event));
+   assert.equal((await learner.request('/api/feedback/'+foreign,{action:'reply',parent_id:root.event,event:crypto.randomUUID(),body:'不应跨课回复'})).status,404);
+  }
+ }
+});

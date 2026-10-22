@@ -6,11 +6,11 @@ try{
  const p=await browser.newPage({viewport:{width,height:width===390?844:900}});await p.context().grantPermissions(['clipboard-read','clipboard-write']);p.on('pageerror',e=>errors.push(e.message));
  // Read-only presentation test, including production: disable shared feedback/metrics before any execution.
  await p.route('**/site-interactions.js',r=>r.fulfill({contentType:'application/javascript',body:''}));
- await p.goto(base+'/');assert.ok(await p.locator('body').evaluate(e=>e.scrollWidth<=innerWidth));await p.screenshot({path:out+`/portal-${width}.png`});
- for(const [id,count] of [['skill-engineering',11],['agentic-loop',16]]){
+ await p.goto(base+'/');assert.ok(await p.locator('body').evaluate(e=>e.scrollWidth<=innerWidth),await p.url()+' viewport '+width);await p.screenshot({path:out+`/portal-${width}.png`});
+ for(const [id,count] of [['skill-engineering',11],['agentic-loop',16],['qwen-office-basics',18],['qwen-office-advanced',18]]){
   const url=base+'/courses/'+id+'/';await p.goto(url+'index.html');
   assert.equal(await p.locator('.course-header nav > [data-course-nav]').count(),2);
-  assert.ok(await p.locator('body').evaluate(e=>e.scrollWidth<=innerWidth));
+  assert.ok(await p.locator('body').evaluate(e=>e.scrollWidth<=innerWidth),await p.url()+' viewport '+width);
   const tokens=await p.evaluate(()=>{let s=getComputedStyle(document.documentElement);return [s.getPropertyValue('--ui-color-action'),s.getPropertyValue('--ui-control-height')]});assert.deepEqual(tokens,['#1669db','44px']);
   await p.locator('.course-resources summary').click();assert.ok(await p.locator('.course-resources[open]').count());await p.keyboard.press('Escape');assert.equal(await p.locator('.course-resources[open]').count(),0);
   if(width>850){await p.locator('#fullscreen').click();await p.waitForFunction(()=>document.fullscreenElement);
@@ -24,14 +24,20 @@ try{
    await p.screenshot({path:out+`/${id}-end-${width}.png`});await p.evaluate(()=>document.exitFullscreen());
    assert.ok(await p.locator('[data-course-end]').isVisible());await p.locator('#first').click();assert.ok(await p.locator('[data-course-end]').isHidden());await p.locator('#contents-toggle').click();assert.equal(await p.locator('#contents a').count(),count);await p.keyboard.press('Escape');
   }
+  if(id.startsWith('qwen-office-')){
+   const slide=id==='qwen-office-basics'?'slide-demo':'slide-web-demo';
+   await p.goto(url+'index.html#'+slide);
+   await p.locator('#'+slide).locator('xpath=..').locator('.explanation a').click();
+   assert.match(p.url(),/\/practice(?:\.html)?#task-2$/);
+  }
   await p.locator('[data-course-nav="practice"]').click();await p.waitForLoadState();assert.equal(await p.locator('[data-course-nav="practice"]').getAttribute('aria-current'),'page');
-  const copy=p.locator('[data-copy]').first();const details=copy.locator('xpath=ancestor::details');for(let n=0;n<await details.count();n++){const d=details.nth(n);if(!await d.getAttribute('open'))await d.locator(':scope > summary').click();}await copy.click();await p.getByText('已复制',{exact:true}).first().waitFor();
-  assert.ok(await p.locator('body').evaluate(e=>e.scrollWidth<=innerWidth));await p.screenshot({path:out+`/${id}-practice-${width}.png`});
+  if(await p.locator('[data-copy]').count()){const copy=p.locator('[data-copy]').first();const details=copy.locator('xpath=ancestor::details');for(let n=0;n<await details.count();n++){const d=details.nth(n);if(!await d.getAttribute('open'))await d.locator(':scope > summary').click();}await copy.click();await p.getByText('已复制',{exact:true}).first().waitFor();}
+  assert.ok(await p.locator('body').evaluate(e=>e.scrollWidth<=innerWidth),await p.url()+' viewport '+width);await p.screenshot({path:out+`/${id}-practice-${width}.png`});
   await p.locator('.course-resources summary').click();await p.locator('[data-course-nav="reading"]').click();await p.waitForLoadState();assert.ok(await p.locator('[data-course-nav="reading"]').getAttribute('aria-current'));
   // Current optional section stays identifiable with the menu both closed and open.
   const menuMark=await p.locator('.course-resources summary').evaluate(e=>getComputedStyle(e).boxShadow);assert.notEqual(menuMark,'none');
   await p.locator('.course-resources summary').click();assert.notEqual(await p.locator('[data-course-nav="reading"]').evaluate(e=>getComputedStyle(e).boxShadow),'none');await p.keyboard.press('Escape');
-  await p.locator('[data-course-nav="practice"]').click();await p.getByRole('link',{name:'完成检查',exact:true}).click();await p.locator('#done table').waitFor();assert.equal(await p.locator('#done tbody tr').count(),id==='skill-engineering'?5:7);
+  await p.locator('[data-course-nav="practice"]').click();await p.getByRole('link',{name:'完成检查',exact:true}).click();if(id.startsWith('qwen-office-')){await p.locator('#done .task-check-all').waitFor();assert.ok(await p.locator('#done li').count()>=15);assert.ok(await p.locator('#prepare').count());}else{await p.locator('#done table').waitFor();assert.equal(await p.locator('#done tbody tr').count(),id==='skill-engineering'?5:7);}
   if(id==='skill-engineering'){
    // Advanced operations are optional and only entered after the basic completion section.
    await p.locator('#done a[href="advanced.html#start"]').click();await p.waitForURL(/\/advanced(?:\.html)?#start$/);
@@ -41,11 +47,11 @@ try{
    await p.goto(url+'deep.html#ticket-practice');await p.waitForURL(/\/practice(?:\.html)?#ticket-practice$/);assert.ok(await p.locator('#chat-task').count());
    await p.goto(url+'deep.html#verification-prep');await p.waitForURL(/\/advanced(?:\.html)?#verification-prep$/);
   }
-  await p.locator('.course-next').waitFor({state:'visible'});assert.ok(await p.locator('body').evaluate(e=>e.scrollWidth<=innerWidth));
+  await p.locator('.course-next').waitFor({state:'visible'});assert.ok(await p.locator('body').evaluate(e=>e.scrollWidth<=innerWidth),await p.url()+' viewport '+width);
   const control=await p.locator('.course-next .ui-primary').boundingBox();assert.ok(control.height>=44);
   reports.push({width,id,status:'PASS'});
  }
  await p.close();
  }
- assert.deepEqual(errors,[]);await fs.writeFile(out+'/browser.json',JSON.stringify({status:'PASS',reports,errors,noProductionWrites:true},null,2));console.log('PASS both courses: nav/resources/copy/end route;27slides fullscreen1440/1024 and390mobile');
+ assert.deepEqual(errors,[]);await fs.writeFile(out+'/browser.json',JSON.stringify({status:'PASS',reports,errors,noProductionWrites:true},null,2));console.log('PASS four courses: nav/resources/copy/end route;63slides fullscreen1440/1024 and390mobile');
 }finally{await browser.close();}
