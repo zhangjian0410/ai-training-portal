@@ -17,14 +17,15 @@ for(const course of catalog.courses){
  ids.add(course.id);
  if(!/^[\w.-]+\/[\w.-]+$/.test(course.repository)||!course.ref||course.ref.startsWith('-'))throw new Error('Invalid course source');
  let source;
- if(localSources[course.id])source=path.resolve(localSources[course.id]);
- else if(course.id==='skill-engineering'&&process.env.COURSE_SOURCE_DIR)source=path.resolve(process.env.COURSE_SOURCE_DIR);
+ const localInput=localSources[course.id]||(course.id==='skill-engineering'&&process.env.COURSE_SOURCE_DIR);
+ if(localInput)source=path.resolve(localInput);
  else{
   source=path.join(root,'build/sources',course.id);
   await fs.rm(source,{recursive:true,force:true});await fs.mkdir(path.dirname(source),{recursive:true});
   execFileSync('git',['clone','--depth','1','--branch',course.ref,'https://github.com/'+course.repository+'.git',source],{stdio:'inherit'});
  }
- if(process.env.SKIP_COURSE_BUILD!=='1')execFileSync('npm',['run','build'],{cwd:source,stdio:'inherit'});
+ // Prebuilt mode applies only to caller-supplied local artifacts; fresh clones must always build.
+ if(process.env.SKIP_COURSE_BUILD!=='1'||!localInput)execFileSync('npm',['run','build'],{cwd:source,stdio:'inherit'});
  const revision=execFileSync('git',['rev-parse','HEAD'],{cwd:source,encoding:'utf8'}).trim();
  const destination=path.join(dist,'courses',course.id);
  await fs.cp(path.join(source,'dist'),destination,{recursive:true});
